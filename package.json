@@ -1,0 +1,17 @@
+{
+  "name": "espn-worker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "setup-login": "node src/setupLogin.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "puppeteer": "^24.30.0"
+  },
+  "description": ""
+}
