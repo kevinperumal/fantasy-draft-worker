@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node src/agent.js",
     "start:legacy": "node src/server.js",
-    "setup-login": "node src/setupLogin.js"
+    "setup-login:slot0": "node src/setupLogin.js --slot 0",
+    "setup-login:slot1": "node src/setupLogin.js --slot 1"
   },
   "keywords": [],
   "author": "",

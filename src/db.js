@@ -74,4 +74,44 @@ async function failJob(jobId, errorMessage) {
   );
 }
 
-module.exports = { claimJob, getDraft, updateJobPhase, completeJob, failJob };
+// Claim the oldest queued job for a specific user.
+// Used by the slot system so each slot only picks up its assigned user's jobs.
+async function claimJobForUser(userId) {
+  const result = await pool.query(
+    `
+    UPDATE jobs
+    SET status = 'running',
+        "claimedAt" = NOW(),
+        "updatedAt" = NOW()
+    WHERE id = (
+      SELECT id FROM jobs
+      WHERE status = 'queued'
+        AND "userId" = $1
+      ORDER BY "createdAt" ASC
+      LIMIT 1
+      FOR UPDATE SKIP LOCKED
+    )
+    RETURNING *
+    `,
+    [userId]
+  );
+  return result.rows[0] || null;
+}
+
+async function getUserIdByUsername(username) {
+  const result = await pool.query(
+    `SELECT id FROM users WHERE username = $1`,
+    [username]
+  );
+  return result.rows[0]?.id || null;
+}
+
+module.exports = {
+  claimJob,
+  claimJobForUser,
+  getUserIdByUsername,
+  getDraft,
+  updateJobPhase,
+  completeJob,
+  failJob,
+};

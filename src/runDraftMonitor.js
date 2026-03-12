@@ -29,8 +29,15 @@ function reportPhase(onPhase, phase) {
   });
 }
 
-async function runDraftMonitor({ sport, leagueId, backendUrl, onPhase = async () => {} }) {
-  const profileDir = path.join(__dirname, "..", ".puppeteer-profile-pi");
+async function runDraftMonitor({
+  sport,
+  leagueId,
+  backendUrl,
+  onPhase = async () => {},
+  // Slot-provided values; fall back to legacy single-display defaults
+  display = process.env.DISPLAY || ":0",
+  profileDir = path.join(__dirname, "..", ".puppeteer-profile-pi"),
+}) {
   const executablePath = process.env.CHROME_PATH || "/usr/bin/chromium-browser";
   const slowMo = Number(process.env.LOGIN_SLOWMO_MS || 50);
   const waitingRoomUrl = `https://fantasy.espn.com/${sport}/waitingroom?leagueId=${leagueId}`;
@@ -46,6 +53,7 @@ async function runDraftMonitor({ sport, leagueId, backendUrl, onPhase = async ()
     userDataDir: profileDir,
     defaultViewport: null,
     executablePath,
+    env: { ...process.env, DISPLAY: display },
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
