@@ -1,9 +1,10 @@
 {
   "name": "espn-worker",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/agent.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node src/agent.js",
+    "start:legacy": "node src/server.js",
     "setup-login": "node src/setupLogin.js"
   },
   "keywords": [],
@@ -11,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.3",
+    "pg": "^8.20.0",
     "puppeteer": "^24.30.0"
   },
   "description": ""
