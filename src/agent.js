@@ -13,7 +13,8 @@ const {
 const { runDraftMonitor } = require("./runDraftMonitor");
 
 const POLL_INTERVAL_MS = 2000;
-const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:3000").replace(/\/+$/, "");
+const rawBackendUrl = process.env.BACKEND_URL || "http://localhost:3000";
+const BACKEND_URL = (rawBackendUrl.startsWith("http") ? rawBackendUrl : `https://${rawBackendUrl}`).replace(/\/+$/, "");
 
 // Resolve slot userIds from usernames at startup.
 // If a slot's username is not configured the slot stays inactive.
