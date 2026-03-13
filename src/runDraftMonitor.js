@@ -97,7 +97,7 @@ async function runDraftMonitor({
 
     reportPhase(onPhase, "draft_live");
 
-    await sleep(5000);
+    await sleep(10000); // wait for draft room UI to fully render
     await enableAutopick(page);
 
     console.log("[worker] Setting window.BACKEND_URL to:", backendUrl);
