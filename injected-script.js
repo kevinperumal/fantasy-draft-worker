@@ -5,6 +5,7 @@
   const backendUrl = rawBackend ? rawBackend.replace(/\/+$/, "") : null;
   const sessionId =
     window.DRAFT_SESSION_ID || window.SESSION_ID || "unknown-session";
+  const leagueId = window.DRAFT_LEAGUE_ID || null;
 
   if (!backendUrl) {
     console.error(
@@ -50,6 +51,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             sessionId,
+            leagueId,
             player: name,
             team,
             position,

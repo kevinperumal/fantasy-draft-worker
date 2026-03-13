@@ -101,9 +101,10 @@ async function runDraftMonitor({
     await enableAutopick(page);
 
     console.log("[worker] Setting window.BACKEND_URL to:", backendUrl);
-    await page.evaluate((url) => {
+    await page.evaluate((url, league) => {
       window.BACKEND_URL = url;
-    }, backendUrl);
+      window.DRAFT_LEAGUE_ID = league;
+    }, backendUrl, leagueId);
 
     const scriptPath = path.join(__dirname, "..", "injected-script.js");
     const scriptContent = fs.readFileSync(scriptPath, "utf8");
