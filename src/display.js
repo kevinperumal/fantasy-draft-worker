@@ -7,7 +7,7 @@ function startDisplay(displayNum) {
   return new Promise((resolve, reject) => {
     const xvfb = spawn(
       "Xvfb",
-      [displayNum, "-screen", "0", "1280x720x24"],
+      [displayNum, "-screen", "0", "1280x720x24", "-ac"],
       { detached: false, stdio: ["ignore", "ignore", "pipe"] }
     );
 
