@@ -78,14 +78,14 @@ async function runDraftMonitor({
     await page.goto(waitingRoomUrl, { waitUntil: "networkidle2" });
     await sleep(2000);
 
+    const currentUrl = page.url();
     const loginText = await page.evaluate(
-      () => document.body.innerText.slice(0, 1000) || ""
+      () => document.body.innerText.slice(0, 500) || ""
     );
     const loggedOut =
-      loginText.includes("Enter your email to continue") ||
-      loginText.includes("Log In") ||
-      loginText.includes("Create Account") ||
-      loginText.includes("Sign Up");
+      currentUrl.includes("/login") ||
+      currentUrl.includes("signin") ||
+      loginText.includes("Enter your email to continue");
     if (loggedOut) {
       throw new Error("SESSION_EXPIRED");
     }
