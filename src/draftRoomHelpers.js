@@ -75,11 +75,8 @@ async function ensureJoinedLeague(page) {
       console.log("Clicking 'Return to Draft Waiting Room'...");
       await returnBtn.click();
     } else {
-      console.log("Return button not found; clicking background to dismiss modal...");
-      const viewport = page.viewport();
-      const x = (viewport?.width || 1200) / 2;
-      const y = (viewport?.height || 800) / 2;
-      await page.mouse.click(x, y);
+      console.log("Return button not found; reloading page to clear modal...");
+      await page.reload({ waitUntil: "networkidle2" });
     }
   } catch (e) {
     console.warn("Error handling success modal (maybe it was auto-closed):", e);
@@ -88,7 +85,9 @@ async function ensureJoinedLeague(page) {
   await sleep(2000);
 }
 
-// Wait until "Enter The Draft" is available, then click it
+// Wait until "Enter The Draft" is available, then click it.
+// Also re-attempts "Join This League" on each poll in case the first attempt
+// failed to fully complete (e.g. modal dismissal didn't work).
 async function enterDraftWhenOpen(page) {
   console.log("Waiting for 'Enter The Draft' to become available...");
 
@@ -113,6 +112,9 @@ async function enterDraftWhenOpen(page) {
       console.log("Should now be in the live draft room.");
       return;
     }
+
+    // Re-attempt join in case the earlier attempt didn't fully complete
+    await ensureJoinedLeague(page);
 
     console.log("'Enter The Draft' not yet visible, refreshing waiting room in 10s...");
     await sleep(10000);
