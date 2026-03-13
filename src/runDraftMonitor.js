@@ -79,9 +79,14 @@ async function runDraftMonitor({
     await sleep(2000);
 
     const loginText = await page.evaluate(
-      () => document.body.innerText.slice(0, 500) || ""
+      () => document.body.innerText.slice(0, 1000) || ""
     );
-    if (loginText.includes("Enter your email to continue")) {
+    const loggedOut =
+      loginText.includes("Enter your email to continue") ||
+      loginText.includes("Log In") ||
+      loginText.includes("Create Account") ||
+      loginText.includes("Sign Up");
+    if (loggedOut) {
       throw new Error("SESSION_EXPIRED");
     }
 

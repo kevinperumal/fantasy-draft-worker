@@ -63,26 +63,35 @@ async function ensureJoinedLeague(page) {
 
   console.log("Found 'Join This League' button. Clicking...");
   await joinBtn.click();
+  await sleep(3000); // wait for modal to fully render
 
   try {
     console.log("Waiting for success modal...");
-    const returnBtn = await findElementByXPath(
-      page,
-      "//button[contains(., 'Return to Draft Waiting Room')]"
-    );
 
-    if (returnBtn) {
-      console.log("Clicking 'Return to Draft Waiting Room'...");
-      await returnBtn.click();
+    // Try several possible modal dismiss/confirm buttons
+    const dismissXPath =
+      "//button[contains(., 'Return to Draft Waiting Room')] | " +
+      "//button[contains(., 'Back to Waiting Room')] | " +
+      "//button[contains(., 'Confirm')] | " +
+      "//button[contains(., 'OK')] | " +
+      "//button[contains(., 'Join')]";
+
+    const dismissBtn = await findElementByXPath(page, dismissXPath);
+
+    if (dismissBtn) {
+      const label = await page.evaluate((el) => el.innerText || el.textContent, dismissBtn);
+      console.log(`Clicking modal button: "${label?.trim()}"...`);
+      await dismissBtn.click();
+      await sleep(2000);
     } else {
-      console.log("Return button not found; reloading page to clear modal...");
-      await page.reload({ waitUntil: "networkidle2" });
+      console.log("No modal button found; reloading to confirm join...");
     }
   } catch (e) {
-    console.warn("Error handling success modal (maybe it was auto-closed):", e);
+    console.warn("Error handling success modal:", e);
   }
 
-  await sleep(2000);
+  await page.reload({ waitUntil: "networkidle2" });
+  await sleep(1000);
 }
 
 // Wait until "Enter The Draft" is available, then click it.
