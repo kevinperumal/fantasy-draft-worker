@@ -21,6 +21,35 @@ function waitForBrowserClose(browser, page) {
   });
 }
 
+// Poll the page every 15s looking for signals that the draft has ended.
+// Resolves (without throwing) when draft end is detected.
+function waitForDraftEnd(page) {
+  return new Promise((resolve) => {
+    const interval = setInterval(async () => {
+      try {
+        const ended = await page.evaluate(() => {
+          const text = document.body.innerText || '';
+          return (
+            text.includes('Draft Complete') ||
+            text.includes('Your draft is complete') ||
+            text.includes('Draft is over') ||
+            text.includes('Draft Results') ||
+            document.querySelector('.draft-complete') !== null ||
+            document.querySelector('[class*="draftComplete"]') !== null
+          );
+        });
+        if (ended) {
+          console.log('[worker] Draft end detected in page content.');
+          clearInterval(interval);
+          resolve();
+        }
+      } catch {
+        // Page may be navigating — ignore and retry next tick
+      }
+    }, 15000);
+  });
+}
+
 // onPhase is a fire-and-forget callback — errors are logged but never
 // allowed to interrupt the automation itself.
 function reportPhase(onPhase, phase) {
@@ -111,9 +140,12 @@ async function runDraftMonitor({
     console.log("[worker] Injecting draft watcher script...");
     await page.evaluate(scriptContent);
 
-    console.log("[worker] Draft watcher running. Waiting for browser to close...");
-    await waitForBrowserClose(browser, page);
-    console.log("[worker] Browser closed. Draft session ended.");
+    console.log("[worker] Draft watcher running. Waiting for draft to end...");
+    await Promise.race([
+      waitForBrowserClose(browser, page),
+      waitForDraftEnd(page),
+    ]);
+    console.log("[worker] Draft session ended.");
   } catch (err) {
     console.error("[worker] Fatal error in runDraftMonitor:", err);
     try { await browser.close(); } catch {}
