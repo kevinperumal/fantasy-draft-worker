@@ -46,9 +46,12 @@
         name = name.split(" ").slice(0, 2).join(" ");
         team = team.toUpperCase();
 
+        const pickHeaders = { "Content-Type": "application/json" };
+        if (window.PICK_SECRET) pickHeaders["X-Pick-Secret"] = window.PICK_SECRET;
+
         fetch(backendUrl + "/picks", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: pickHeaders,
           body: JSON.stringify({
             sessionId,
             leagueId,

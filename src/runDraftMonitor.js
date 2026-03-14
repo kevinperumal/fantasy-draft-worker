@@ -60,6 +60,7 @@ async function runDraftMonitor({
   sport,
   leagueId,
   backendUrl,
+  pickSecret = null,
   onPhase = async () => {},
   // Slot-provided values; fall back to legacy single-display defaults
   display = process.env.DISPLAY || ":0",
@@ -128,10 +129,11 @@ async function runDraftMonitor({
     await enableAutopick(page);
 
     console.log("[worker] Setting window.BACKEND_URL to:", backendUrl);
-    await page.evaluate((url, league) => {
+    await page.evaluate((url, league, secret) => {
       window.BACKEND_URL = url;
       window.DRAFT_LEAGUE_ID = league;
-    }, backendUrl, leagueId);
+      if (secret) window.PICK_SECRET = secret;
+    }, backendUrl, leagueId, pickSecret);
 
     const scriptPath = path.join(__dirname, "..", "injected-script.js");
     const scriptContent = fs.readFileSync(scriptPath, "utf8");

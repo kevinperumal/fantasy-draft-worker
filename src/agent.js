@@ -15,6 +15,7 @@ const { runDraftMonitor } = require("./runDraftMonitor");
 const POLL_INTERVAL_MS = 2000;
 const rawBackendUrl = process.env.BACKEND_URL || "http://localhost:3000";
 const BACKEND_URL = (rawBackendUrl.startsWith("http") ? rawBackendUrl : `https://${rawBackendUrl}`).replace(/\/+$/, "");
+const PICK_SECRET = process.env.PICK_SECRET || null;
 
 // Resolve slot userIds from usernames at startup.
 // If a slot's username is not configured the slot stays inactive.
@@ -71,6 +72,7 @@ async function runJob(job, slot) {
       sport: draft.sport,
       leagueId: draft.leagueId,
       backendUrl: BACKEND_URL,
+      pickSecret: PICK_SECRET,
       display: slot.display,
       profileDir: path.join(__dirname, "..", slot.profileDir),
       onPhase: (phase) => updateJobPhase(job.id, phase),
