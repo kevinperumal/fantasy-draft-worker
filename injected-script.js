@@ -46,6 +46,18 @@
         name = name.split(" ").slice(0, 2).join(" ");
         team = team.toUpperCase();
 
+        // Best-effort: try to extract the fantasy team name that made this pick.
+        // ESPN's draft log entry header is in childNodes[0] of the outer node.
+        let pickerTeam = "";
+        try {
+          const headerNode = node.childNodes[0]?.childNodes[0];
+          pickerTeam = (headerNode?.innerText || "").trim();
+          // If it looks like "Round X, Pick Y" it's a header not a team name — skip
+          if (/round|pick\s+\d/i.test(pickerTeam)) pickerTeam = "";
+        } catch {
+          pickerTeam = "";
+        }
+
         const pickHeaders = { "Content-Type": "application/json" };
         if (window.PICK_SECRET) pickHeaders["X-Pick-Secret"] = window.PICK_SECRET;
 
@@ -58,6 +70,7 @@
             player: name,
             team,
             position,
+            pickerTeam: pickerTeam || undefined,
           }),
         })
           .then((res) => {
