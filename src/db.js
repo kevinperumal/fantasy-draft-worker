@@ -63,15 +63,23 @@ async function completeJob(jobId, draftId) {
 }
 
 async function failJob(jobId, errorMessage) {
-  await pool.query(
+  const result = await pool.query(
     `UPDATE jobs
      SET status = 'failed',
          phase = 'error',
          "errorMessage" = $1,
          "updatedAt" = NOW()
-     WHERE id = $2`,
+     WHERE id = $2
+     RETURNING "draftId"`,
     [errorMessage, jobId]
   );
+  const draftId = result.rows[0]?.draftId;
+  if (draftId) {
+    await pool.query(
+      `UPDATE drafts SET status = 'canceled', "updatedAt" = NOW() WHERE id = $1`,
+      [draftId]
+    );
+  }
 }
 
 // Claim the oldest queued job for a specific user.

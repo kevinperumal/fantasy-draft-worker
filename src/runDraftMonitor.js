@@ -30,12 +30,10 @@ function waitForDraftEnd(page) {
         const ended = await page.evaluate(() => {
           const text = document.body.innerText || '';
           return (
-            text.includes('Draft Complete') ||
             text.includes('Your draft is complete') ||
-            text.includes('Draft is over') ||
-            text.includes('Draft Results') ||
-            document.querySelector('.draft-complete') !== null ||
-            document.querySelector('[class*="draftComplete"]') !== null
+            text.includes('Your draft is complete!') ||
+            document.querySelector('[class*="sharing__draft-complete"]') !== null ||
+            document.querySelector('[class*="draft-complete"]') !== null
           );
         });
         if (ended) {
