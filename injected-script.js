@@ -43,7 +43,7 @@
         let team = container.childNodes[2]?.innerText || "";
         let position = container.childNodes[4]?.innerText || "";
 
-        name = name.split(" ").slice(0, 2).join(" ");
+        name = name.split(" ").slice(0, 3).join(" ").trim();
         team = team.toUpperCase();
 
         // Best-effort: try to extract the fantasy team name that made this pick.
